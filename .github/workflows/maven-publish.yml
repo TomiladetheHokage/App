@@ -1,5 +1,8 @@
 name: Maven Package
 
+env:
+  DOCKER_HUB_REPO: tomilade1/movie-manager-backend
+
 on:
   push:
     branches: ["master"]
@@ -56,20 +59,20 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    # # Log in to Docker Hub
-    # - name: Log in to Docker Hub
-    #   run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+    # Log in to Docker Hub
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
-    # # Set up Docker Buildx
-    # - name: Set up Docker Buildx
-    #   run: |
-    #     docker buildx create --name multiarch-builder --use
-    #     docker buildx inspect --bootstrap
+    # Set up Docker Buildx
+    - name: Set up Docker Buildx
+      run: |
+        docker buildx create --name multiarch-builder --use
+        docker buildx inspect --bootstrap
 
-    # # Build and push Docker image to Docker Hub
-    # - name: Build and push Docker image to Docker Hub
-    #   run: |
-    #     docker buildx build --platform linux/amd64,linux/arm64 \
-    #       -t ${{ env.DOCKER_HUB_REPO }}:latest \
-    #       -t ${{ env.DOCKER_HUB_REPO }}:$GITHUB_SHA \
-    #       --push .
+    # Build and push Docker image to Docker Hub
+    - name: Build and push Docker image to Docker Hub
+      run: |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t ${{ env.DOCKER_HUB_REPO }}:latest \
+          -t ${{ env.DOCKER_HUB_REPO }}:$GITHUB_SHA \
+          --push .
