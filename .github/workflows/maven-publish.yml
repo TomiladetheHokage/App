@@ -3,8 +3,8 @@
 
 name: Maven Package
 
-env:
-  DOCKER_HUB_REPO: tomilade1/docker-practice
+# env:
+#   DOCKER_HUB_REPO: tomilade1/docker-practice
 
 on:
   push:
@@ -62,8 +62,8 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
 
-    # - name: build docker image
-    #   run : docker build -t docker-practice-d .
+    - name: build docker image
+      run : docker build -t docker-practice-d .
 
     # - name: log in to Docker hub
     #   run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
