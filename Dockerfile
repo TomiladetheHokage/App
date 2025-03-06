@@ -1,17 +1,22 @@
-# Use an official Maven image as the base image
-FROM maven:3.8.4-openjdk-11-slim AS build
-# Set the working directory in the container
+# Use Maven with JDK 21 to build the application
+FROM maven:3.8.7-eclipse-temurin-21 AS build
+
 WORKDIR /app
-# Copy the pom.xml and the project files to the container
-COPY pom.xml .
-COPY src ./src
-# Build the application using Maven
+COPY . .
+
+# Run Maven clean and package, skipping tests
 RUN mvn clean package -DskipTests
-# Use an official OpenJDK image as the base image
-FROM openjdk:21
-# Set the working directory in the container
+
+# Use a lightweight JDK 21 image to run the app
+FROM openjdk:21-jdk-slim
+
 WORKDIR /app
-# Copy the built JAR file from the previous stage to the container
-COPY --from=build /app/target/my-application.jar .
-# Set the command to run the application
-CMD ["java", "-jar", "my-application.jar"]
+
+# Copy the built JAR file from the build stage
+COPY --from=build /app/target/*.jar app.jar
+
+# Expose port 8080
+EXPOSE 8080
+
+# Set the entry point to run the JAR file
+ENTRYPOINT ["java", "-jar", "-Dserver.port=8080", "app.jar"]
