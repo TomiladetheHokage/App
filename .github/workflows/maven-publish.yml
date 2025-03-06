@@ -27,5 +27,7 @@ jobs:
 
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - name: build docker image
+      run : docker build -t docker-practice-d .
 
    
