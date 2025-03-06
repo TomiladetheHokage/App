@@ -3,9 +3,12 @@
 
 name: Maven Package
 
+env:
+  DOCKER_HUB_REPO: tomilade1/docker-practice
+
 on:
-  release:
-    types: [created]
+  push:
+    branches: ["master"]
 
 jobs:
   build:
@@ -15,8 +18,38 @@ jobs:
       contents: read
       packages: write
 
+  
+    # services:
+    #     postgres:
+    #       image: postgres:13
+    #       env:
+    #         POSTGRES_USER: postgres
+    #         POSTGRES_PASSWORD: tomilade01
+    #         POSTGRES_DB: postgres
+    #       options: >- 
+    #         --health-cmd "pg_isready -U postgres"
+    #         --health-interval 10s
+    #         --health-timeout 5s
+    #         --health-retries 5
+    #       ports:
+    #         - 5432:5432
+
     steps:
     - uses: actions/checkout@v4
+      with:
+         fetch-depth: 0
+
+    # - name: Wait for postgres to be ready
+    #   run: |
+    #     for i in {1..30}; do
+    #         if pg_isready -h localhost -p 5432 -U postgres; then
+    #           echo "Postgres is ready"
+    #           break
+    #         fi
+    #         echo "Waiting for postgres..."
+    #         sleep 1
+    #     done
+        
     - name: Set up JDK 21
       uses: actions/setup-java@v4
       with:
@@ -25,9 +58,24 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
+        
     - name: Build with Maven
       run: mvn -B package --file pom.xml
-    - name: build docker image
-      run : docker build -t docker-practice-d .
 
-   
+    # - name: build docker image
+    #   run : docker build -t docker-practice-d .
+
+    # - name: log in to Docker hub
+    #   run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+    # - name: Set up Docker Buildx
+    #   run: |
+    #     docker buildx create --name multiarch-builder --use
+    #     docker buildx inspect --bootstrap
+
+    # - name: Build and push Docker image to Docker Hub
+    #   run: |
+    #     docker buildx build --platform linux/amd64,linux/arm64 \
+    #       -t ${{ env.DOCKER_HUB_REPO }}:latest \
+    #       -t ${{ env.DOCKER_HUB_REPO }}:$GITHUB_SHA \
+    #       --push .
